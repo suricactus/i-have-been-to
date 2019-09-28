@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>I have been to...</title>
+  <meta property="description" content="" />
+  <meta property="og:title" content="" />
+  <meta property="og:description" content="" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <template id="tmpl-control-places">
+    <div id="cc">
+      <button type="button" id="cc-toggle-btn" class="btn" data-toggled="0">-</button>
+      <label id="cc-label">
+        <span id="cc-been-to">I have been to:</span>
+        <input type="text" id="cc-search" placeholder="Type to filter" />
+      </label>
+      <ul id="cc-list"></ul>
+    </div>
+  </template>
+
+  <dialog id="cc-dialog">
+    <form method="dialog">
+      <h3>Share</h3>
+      <button type="button" id="cc-dialog-close-btn" class="btn" value="cancel">x</button>
+      Share with your friends where you have travelled!
+
+      <div id="cc-share-copy">
+        <input type="text" id="cc-share-copy-input" />
+        <button type="button" id="cc-share-copy-btn" class="btn">Copy</button>
+      </div>
+      <div id="cc-share-social">
+        <!-- credist go to: https://sharingbuttons.io/ -->
+        <!-- Sharingbutton Facebook -->
+        <a id="cc-share-facebook" class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=http%3A%2F%2Fsuricactus.com" target="_blank" rel="noopener" aria-label="">
+          <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
+            </div>
+          </div>
+        </a>
+
+        <!-- Sharingbutton Twitter -->
+        <a id="cc-share-twitter" class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=Hello&amp;url=http%3A%2F%2Fsuricactus.com" target="_blank" rel="noopener" aria-label="">
+          <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
+            </div>
+          </div>
+        </a>
+
+        <!-- Sharingbutton LinkedIn -->
+        <a id="cc-share-linkedin" class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fsuricactus.com&amp;title=Hello&amp;summary=Hello&amp;source=http%3A%2F%2Fsuricactus.com" target="_blank" rel="noopener" aria-label="">
+          <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 21.5h-5v-13h5v13zM4 6.5C2.5 6.5 1.5 5.3 1.5 4s1-2.4 2.5-2.4c1.6 0 2.5 1 2.6 2.5 0 1.4-1 2.5-2.6 2.5zm11.5 6c-1 0-2 1-2 2v7h-5v-13h5V10s1.6-1.5 4-1.5c3 0 5 2.2 5 6.3v6.7h-5v-7c0-1-1-2-2-2z"/></svg>
+            </div>
+          </div>
+        </a>
+
+        <!-- Sharingbutton WhatsApp -->
+        <a id="cc-share-whatsapp" class="resp-sharing-button__link" href="whatsapp://send?text=Hello%20http%3A%2F%2Fsuricactus.com" target="_blank" rel="noopener" aria-label="">
+          <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.1 3.9C17.9 1.7 15 .5 12 .5 5.8.5.7 5.6.7 11.9c0 2 .5 3.9 1.5 5.6L.6 23.4l6-1.6c1.6.9 3.5 1.3 5.4 1.3 6.3 0 11.4-5.1 11.4-11.4-.1-2.8-1.2-5.7-3.3-7.8zM12 21.4c-1.7 0-3.3-.5-4.8-1.3l-.4-.2-3.5 1 1-3.4L4 17c-1-1.5-1.4-3.2-1.4-5.1 0-5.2 4.2-9.4 9.4-9.4 2.5 0 4.9 1 6.7 2.8 1.8 1.8 2.8 4.2 2.8 6.7-.1 5.2-4.3 9.4-9.5 9.4zm5.1-7.1c-.3-.1-1.7-.9-1.9-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.2-.5-2.3-1.4c-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6s.3-.3.4-.5c.2-.1.3-.3.4-.5.1-.2 0-.4 0-.5C10 9 9.3 7.6 9 7c-.1-.4-.4-.3-.5-.3h-.6s-.4.1-.7.3c-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.3-.3-.4-.6-.5z"/></svg>
+            </div>
+          </div>
+        </a>
+
+        <!-- Sharingbutton Telegram -->
+        <a id="cc-share-telegram" class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Hello&amp;url=http%3A%2F%2Fsuricactus.com" target="_blank" rel="noopener" aria-label="">
+          <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M.707 8.475C.275 8.64 0 9.508 0 9.508s.284.867.718 1.03l5.09 1.897 1.986 6.38a1.102 1.102 0 0 0 1.75.527l2.96-2.41a.405.405 0 0 1 .494-.013l5.34 3.87a1.1 1.1 0 0 0 1.046.135 1.1 1.1 0 0 0 .682-.803l3.91-18.795A1.102 1.102 0 0 0 22.5.075L.706 8.475z"/></svg>
+            </div>
+          </div>
+        </a>
+      </div>
+    </form>
+  </dialog>
+
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
+  <link rel="stylesheet" href="./css/main.css" />
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+    integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+    crossorigin=""></script>
+  <script type="text/javascript">
+    const LOCAL_STORAGE_KEY_PLACES = 'places';
+    const QUERY_PARAM_PLACES = 'places';
+    const PLACES_SEPARATOR_SYMBOL = '.';
+    const map = L.map('map').setView([50, 15], 5);
+    const updateLocalStorage = (places) => {
+      localStorage.setItem(LOCAL_STORAGE_KEY_PLACES, places);
+    };
+    const places = (() => {
+      const placesFromUrl = (new URL(window.location.href)).searchParams.get(QUERY_PARAM_PLACES);
+      let places = null;
+
+      if(placesFromUrl) {
+        updateLocalStorage(placesFromUrl);
+        places = placesFromUrl;
+      } else {
+        places = localStorage.getItem(LOCAL_STORAGE_KEY_PLACES);
+      }
+
+      return places ? places.split(PLACES_SEPARATOR_SYMBOL) : [];
+    })();
+    const updateUrl = (places) => {
+      const urlObj = new URL(document.location);
+
+      if(places) {
+        urlObj.searchParams.set(QUERY_PARAM_PLACES, places);
+      } else {
+        urlObj.searchParams.delete(QUERY_PARAM_PLACES);
+      }
+
+      window.history.pushState({ path: urlObj.href }, '', urlObj.href);
+    };
+    const prepareStrings = (countries) => {
+      const count = countries.length;
+      const title = count === 1
+        ? `I have been to ${count} country only`
+        : `I have been to ${count} countries`;
+      const label = count === 1
+        ? `I have been to ${count} country only`
+        : `I have been to ${count} countries`;
+      const descr = count === 1
+        ? `Share which countries you have visited! I have been to ${countries[0]} only.`
+        : `Share which countries you have visited! I have been to ${count} countries: ${countries.join(', ')}.`;
+
+      return {
+        title,
+        label,
+        descr,
+      };
+    };
+    const updateDynamicContent = ({ title, label, descr }) => {
+      document.body.title = title;
+      document.querySelector('meta[property="description"]').innerHTML = descr;
+      document.querySelector('meta[property="og:title"]').innerHTML = title;
+      document.querySelector('meta[property="og:description"]').innerHTML = descr;
+
+      const link = document.querySelector('#cc-share-copy-input');
+
+      link.value = window.location.href;
+
+      const fb = document.querySelector('#cc-share-facebook');
+      const tw = document.querySelector('#cc-share-twitter');
+      const li = document.querySelector('#cc-share-linkedin');
+      const wa = document.querySelector('#cc-share-whatsapp');
+      const tl = document.querySelector('#cc-share-telegram');
+
+      const fbUrl = new URL(fb.href);
+      fbUrl.searchParams.set('url', window.location.href);
+      fb.href = fbUrl.toString();
+
+      const twUrl = new URL(tw.href);
+      twUrl.searchParams.set('text', descr);
+      twUrl.searchParams.set('url', window.location.href);
+      tw.href = twUrl.toString();
+
+      const liUrl = new URL(li.href);
+      liUrl.searchParams.set('title', title);
+      liUrl.searchParams.set('summary', descr);
+      liUrl.searchParams.set('url', window.location.href);
+      liUrl.searchParams.set('source', window.location.origin);
+      li.href = liUrl.toString();
+
+      const waUrl = new URL(wa.href);
+      liUrl.searchParams.set('text', `${title} ${window.location.href}`);
+      wa.href = waUrl.toString();
+
+      const tlUrl = new URL(tl.href);
+      tlUrl.searchParams.set('text', descr);
+      tlUrl.searchParams.set('url', window.location.href);
+      tl.href = tlUrl.toString();
+    };
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    ((L) => {
+      L.Control.Share = L.Control.extend({
+        $container: document.createElement('div'),
+        $dialog: document.querySelector('#cc-dialog'),
+        $dialogCloseBtn: document.querySelector('#cc-dialog-close-btn'),
+        $copyInput: document.querySelector('#cc-share-copy-input'),
+        $copyBtn: document.querySelector('#cc-share-copy-btn'),
+
+        onShareButtonClick() {
+          if(this.$dialog.showModal) {
+            this.$dialog.showModal();
+          } else {
+            alert(`Share this link with your friends:\n${window.location.href}`);
+          }
+        },
+
+        onCopyButtonClick() {
+          this.$copyInput.select();
+          this.$copyInput.setSelectionRange(0, 99999); /*For mobile devices*/
+
+          /* Copy the text inside the text field */
+          document.execCommand('copy');
+        },
+
+        onAdd(map) {
+          this.$container.innerHTML = '<button id="cc-share" class="btn">Share</button>';
+          this.$share = this.$container.querySelector('#cc-share');
+          this.$share.addEventListener('click', (event) => this.onShareButtonClick());
+          this.$copyBtn.addEventListener('click', (event) => this.onCopyButtonClick(event))
+          this.$dialogCloseBtn.addEventListener('click', (event) => this.$dialog.close())
+
+          return this.$container;
+        },
+      });
+
+      L.Control.Places = L.Control.extend({
+        // set of the currently selected places
+        placeIds: new Set(),
+
+        // geojson layer containing the places polygons
+        placesLayer: null,
+
+        // main container of the control
+        $control: document.createElement('div'),
+
+        // search box input
+        $search: null,
+
+        // toggle button
+        $toggleBtn: null,
+
+        // list items of countries
+        $listItems: null,
+
+        get minCharsToSearch() {
+          return this.options.minCharsToSearch || 1;
+        },
+
+        onAdd(map) {
+          const {
+            geojson,
+            geojsonStyle,
+            places = [],
+          } = this.options;
+
+          places.map(place => this.togglePlace(place, true));
+
+          this.placesLayer = L.geoJSON(geojson, {
+            style: (f) => {
+              if (typeof geojsonStyle === 'function') {
+                return geojsonStyle(f, this);
+              } else {
+                return geojsonStyle;
+              }
+            },
+            onEachFeature: (f, l) => {
+              l.on('click', (event) => this.onFeatureClick(event, f, l));
+              this.on('placeChanged', () => l.setStyle(this.options.geojsonStyle(f, this)));
+            },
+          }).addTo(map);
+
+          this.$control.addEventListener('click', event => event.stopPropagation());
+          this.$control.addEventListener('wheel', event => event.stopPropagation());
+          this.$control.addEventListener('dblclick', event => event.stopPropagation());
+
+          this.render(map, geojson);
+
+          return this.$control;
+        },
+
+        render(map, places) {
+          const $tmplControl = document.querySelector('#tmpl-control-places');
+          const $control = document.importNode($tmplControl.content, true);
+          const $list = $control.querySelector('#cc-list');
+
+          this.$control.appendChild($control);
+
+          for (const place of places.features) {
+            const $li = document.createElement('li');
+            const $label = document.createElement('label');
+            const $checkbox = document.createElement('input');
+
+            $label.appendChild($checkbox);
+
+            $checkbox.type = 'checkbox';
+            $checkbox.value = place.properties.id;
+            $checkbox.autocomplete = 'off';
+
+            $label.innerHTML += place.properties.name;
+            // TODO one day I should support subdivisions of the countries
+            // $label.innerHTML += '<span class="pull-left">unity|regions</span>';
+
+            $label.addEventListener('change', (event) => this.onPlaceCheckboxChanged(event));
+
+            $li.appendChild($label);
+            $list.appendChild($li);
+          }
+
+          this.$listItems = this.$control.querySelectorAll('#cc-list > li')
+          this.$search = this.$control.querySelector('#cc-search');
+          this.$toggleBtn = this.$control.querySelector('#cc-toggle-btn');
+
+          this.$toggleBtn.addEventListener('click', (event) => this.onToggleBtnClick(event));
+          this.$search.addEventListener('keydown', (event) => this.onSearchInputKeydown(event));
+          this.$search.addEventListener('input', (event) => this.onSearchInput(event));
+          // BUG WORKAROUND: this does not work if I use $checkbox.addEventListener in the loop above, no idea why...
+          this.$control.querySelectorAll('input[type="checkbox"]')
+            .forEach($input => {
+              $input.checked = this.hasPlace($input.value);
+              $input.addEventListener('focus', ({ target }) => target.closest('li').classList.add('active'));
+              $input.addEventListener('blur', ({ target }) => target.closest('li').classList.remove('active'));
+              $input.addEventListener('keydown', (event) => this.onCheckboxKeydown(event));
+            });
+        },
+
+        onPlaceCheckboxChanged({ target }) {
+          this.togglePlace(target.value);
+        },
+
+        onSearchInput({ target }) {
+          this.resetSearch();
+
+          if (target.value < this.minCharsToSearch) return;
+          if (!this.$listItems) return;
+
+          const re = RegExp(target.value, 'i');
+
+          this.$listItems.forEach(($li) => {
+              $li.hidden = !re.test($li.innerText);
+            });
+        },
+
+        onToggleBtnClick(event) {
+          const { target } = event;
+          const toggled = target.dataset.toggled === '0';
+
+          target.dataset.toggled = +toggled;
+
+          if(toggled) {
+            target.innerHTML = '+';
+          } else {
+            target.innerHTML = '-';
+          }
+
+          this.$control.classList.toggle('collapsed', toggled)
+        },
+
+        onSearchInputKeydown(event) {
+          const { target, key } = event;
+
+          if(key === 'ArrowDown') {
+            event.preventDefault();
+            target.closest('#cc').querySelector('ul input[type="checkbox"]').focus();
+          } else if (key === 'Enter') {
+            const $checkbox = target.closest('#cc').querySelector('ul input[type="checkbox"]');
+
+            $checkbox.checked = !$checkbox.checked;
+
+            event.preventDefault();
+          } else {
+            // do nothing
+          }
+        },
+
+        onCheckboxKeydown(event) {
+          const { target, key } = event;
+
+          if(key === 'ArrowDown') {
+            event.preventDefault();
+
+            const sibling = this.nextVisibleSibling(target.closest('li'), target.closest('ul').querySelectorAll('li'));
+
+            if (sibling) {
+              sibling.querySelector('input').focus();
+            } else {
+              this.$search.focus();
+            }
+          } else if (key === 'ArrowUp') {
+            event.preventDefault();
+
+            const sibling = this.previousVisibleSibling(target.closest('li'), target.closest('ul').querySelectorAll('li'));
+
+            if (sibling) {
+              sibling.querySelector('input').focus();
+            } else {
+              this.$search.focus();
+            }
+          } else if (key === 'Escape') {
+            this.$search.focus();
+          } else if (key === 'Enter') {
+            target.click();
+          } else {
+            // do nothings
+          }
+        },
+
+        onFeatureClick(event, f, l) {
+          const placeId = f.properties.id;
+
+          this.togglePlace(placeId);
+        },
+
+        resetSearch() {
+          this.$listItems.forEach(($li) => $li.hidden = false);
+        },
+
+        nextVisibleSibling(target, els) {
+          let sibling = target;
+
+          while (sibling) {
+            sibling = sibling.nextSibling;
+
+            if(sibling && !sibling.hidden) break;
+          }
+
+          if(!sibling) {
+            sibling = [...els].find(el => !el.hidden);
+          }
+
+          return sibling;
+        },
+
+        previousVisibleSibling(target, els) {
+          let sibling = target;
+
+          while (sibling) {
+            sibling = sibling.previousSibling;
+
+            if(sibling && !sibling.hidden) break;
+          }
+
+          if(!sibling) {
+            sibling = [...els].reverse().find(el => !el.hidden);
+          }
+
+          return sibling;
+        },
+
+        updateCheckboxChecked(placeId, isChecked) {
+          if (!this.$listItems) return;
+
+          this.$listItems.forEach($li => {
+            const $checkbox = $li.querySelector(`input[value="${placeId}"]`);
+
+            if (!$checkbox) return;
+
+            $checkbox.checked = isChecked;
+          });
+        },
+
+        togglePlace(placeId, toggled) {
+          if (typeof toggled !== 'boolean') {
+            toggled = !this.hasPlace(placeId);
+          }
+
+          if(toggled) {
+            this.placeIds.add(placeId);
+          } else {
+            this.placeIds.delete(placeId);
+          }
+
+          this.updateCheckboxChecked(placeId, toggled);
+
+          const places = this.getPlaceIds().join(PLACES_SEPARATOR_SYMBOL);
+
+          this.fire('placeChanged', { placeId, toggled });
+          this.fire('placesChanged', { places });
+
+          return toggled;
+        },
+
+        hasPlace(placeId) {
+          return this.placeIds.has(placeId);
+        },
+
+        getPlaceIds() {
+          return [...this.placeIds.values()];
+        },
+
+        getPlaces() {
+          return this.options.geojson.features
+            .filter(f => this.hasPlace(f.properties.id))
+            .map(f => f.properties.name);
+        },
+      });
+
+      L.extend(L.Control.Places.prototype, L.Evented.prototype);
+
+      L.control.places = function(opts) {
+        return new L.Control.Places(opts);
+      };
+
+      L.control.share = function(opts) {
+        return new L.Control.Share(opts);
+      };
+    })(L);
+
+    const start = async () => {
+      const geojson = await fetch('./data/countries.geo.json')
+        .then(r => r.json());
+
+      const placesControl = L.control.places({
+        position: 'topright',
+        geojsonStyle: (f, plugin) => {
+          return {
+            fillColor: plugin.hasPlace(f.properties.id) ? 'rgba(0, 180, 0, 0.5)' : 'transparent',
+            weight: 2,
+            opacity: 1,
+            color: '#333',
+            dashArray: '3',
+            fillOpacity: 0.7
+          };
+        },
+        places,
+        geojson,
+      });
+
+      const shareControl = L.control.share({
+        position: 'topright',
+      }).addTo(map)
+
+      placesControl.on('placesChanged', ({ places }) => {
+        const strings = prepareStrings(placesControl.getPlaces());
+
+        updateUrl(places);
+        updateLocalStorage(places)
+        updateDynamicContent(strings)
+      })
+      .addTo(map);
+    };
+
+    start()
+      .catch((err) => {
+        console.log(err)
+      });
+
+
+  </script>
+</body>
+</html>
