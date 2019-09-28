@@ -5,6 +5,7 @@
   <meta property="description" content="" />
   <meta property="og:title" content="" />
   <meta property="og:description" content="" />
+  <meta property="og:image" content="" />
 </head>
 <body>
   <div id="map"></div>
@@ -13,7 +14,7 @@
     <div id="cc">
       <button type="button" id="cc-toggle-btn" class="btn" data-toggled="0">-</button>
       <label id="cc-label">
-        <span id="cc-been-to">I have been to:</span>
+        <span id="cc-been-to">I have been to 0 countries:</span>
         <input type="text" id="cc-search" placeholder="Type to filter" />
       </label>
       <ul id="cc-list"></ul>
@@ -91,6 +92,17 @@
     const updateLocalStorage = (places) => {
       localStorage.setItem(LOCAL_STORAGE_KEY_PLACES, places);
     };
+    const getRelativeUrl = (path) => {
+      const url = new URL(window.location.href);
+
+      if (/\/$/.test(url.pathname)) {
+        url.pathname += path;
+      } else {
+        url.pathname.replace(/(.*)\/.*?$/, '$1/' + path);
+      }
+
+      return url.toString();
+    };
     const places = (() => {
       const placesFromUrl = (new URL(window.location.href)).searchParams.get(QUERY_PARAM_PLACES);
       let places = null;
@@ -121,8 +133,8 @@
         ? `I have been to ${count} country only`
         : `I have been to ${count} countries`;
       const label = count === 1
-        ? `I have been to ${count} country only`
-        : `I have been to ${count} countries`;
+        ? `I have been to ${count} country:`
+        : `I have been to ${count} countries:`;
       const descr = count === 1
         ? `Share which countries you have visited! I have been to ${countries[0]} only.`
         : `Share which countries you have visited! I have been to ${count} countries: ${countries.join(', ')}.`;
@@ -134,10 +146,16 @@
       };
     };
     const updateDynamicContent = ({ title, label, descr }) => {
-      document.body.title = title;
-      document.querySelector('meta[property="description"]').innerHTML = descr;
-      document.querySelector('meta[property="og:title"]').innerHTML = title;
-      document.querySelector('meta[property="og:description"]').innerHTML = descr;
+      document.title = title;
+
+      document.querySelector('meta[property="description"]').content = descr;
+      document.querySelector('meta[property="og:title"]').content = title;
+      document.querySelector('meta[property="og:description"]').content = descr;
+      document.querySelector('meta[property="og:image"]').content = getRelativeUrl('images/sharable.jpg');
+
+      if(document.querySelector('#cc-been-to')) {
+        document.querySelector('#cc-been-to').innerHTML = label;
+      }
 
       const link = document.querySelector('#cc-share-copy-input');
 
@@ -348,14 +366,16 @@
 
         onSearchInputKeydown(event) {
           const { target, key } = event;
+          const $firstVisibleCheckbox = [...this.$listItems]
+            .find($li => !$li.hidden)
+            .querySelector('input[type="checkbox"]');
 
           if(key === 'ArrowDown') {
             event.preventDefault();
-            target.closest('#cc').querySelector('ul input[type="checkbox"]').focus();
-          } else if (key === 'Enter') {
-            const $checkbox = target.closest('#cc').querySelector('ul input[type="checkbox"]');
 
-            $checkbox.checked = !$checkbox.checked;
+            $firstVisibleCheckbox.focus();
+          } else if (key === 'Enter') {
+            $firstVisibleCheckbox.checked = !$firstVisibleCheckbox.checked;
 
             event.preventDefault();
           } else {
@@ -524,15 +544,19 @@
         const strings = prepareStrings(placesControl.getPlaces());
 
         updateUrl(places);
-        updateLocalStorage(places)
-        updateDynamicContent(strings)
+        updateLocalStorage(places);
+
+        // TODO ugly workaround, but I'm too lazy to fix it :(
+        setTimeout(() => {
+          updateDynamicContent(strings);
+        });
       })
       .addTo(map);
     };
 
     start()
       .catch((err) => {
-        console.log(err)
+        alert('Unfortunately the page encountered an error. Please file a github issue at https://github.com/suricactus/i-have-been-to .')
       });
 
 
