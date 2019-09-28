@@ -134,7 +134,9 @@
         : `I have been to ${count} countries`;
       const label = count === 1
         ? `I have been to ${count} country:`
-        : `I have been to ${count} countries:`;
+        : count === 0
+          ? `Select a country:`
+          : `I have been to ${count} countries:`;
       const descr = count === 1
         ? `Share which countries you have visited! I have been to ${countries[0]} only.`
         : `Share which countries you have visited! I have been to ${count} countries: ${countries.join(', ')}.`;
@@ -262,7 +264,11 @@
             places = [],
           } = this.options;
 
-          places.map(place => this.togglePlace(place, true));
+          places.map(place => this.placeIds.add(place));
+          // TODO ugly workaround, but I'm too lazy to fix it :(
+          setTimeout(() => {
+            this.fire('placesChanged', { places });
+          });
 
           this.placesLayer = L.geoJSON(geojson, {
             style: (f) => {
@@ -545,17 +551,14 @@
 
         updateUrl(places);
         updateLocalStorage(places);
-
-        // TODO ugly workaround, but I'm too lazy to fix it :(
-        setTimeout(() => {
-          updateDynamicContent(strings);
-        });
+        updateDynamicContent(strings);
       })
       .addTo(map);
     };
 
     start()
       .catch((err) => {
+        console.log(err);
         alert('Unfortunately the page encountered an error. Please file a github issue at https://github.com/suricactus/i-have-been-to .')
       });
 
