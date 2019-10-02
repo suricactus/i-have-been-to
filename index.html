@@ -91,7 +91,7 @@
     const PLACES_SEPARATOR_SYMBOL = '.';
     const map = L.map('map').setView([50, 15], 5);
     const updateLocalStorage = (places) => {
-      localStorage.setItem(LOCAL_STORAGE_KEY_PLACES, places.join(PLACES_SEPARATOR_SYMBOL));
+      localStorage.setItem(LOCAL_STORAGE_KEY_PLACES, places);
     };
     const getRelativeUrl = (path) => {
       const url = new URL(window.location.href);
@@ -121,7 +121,7 @@
       const urlObj = new URL(document.location);
 
       if(places) {
-        urlObj.searchParams.set(QUERY_PARAM_PLACES, places.join(PLACES_SEPARATOR_SYMBOL));
+        urlObj.searchParams.set(QUERY_PARAM_PLACES, places);
       } else {
         urlObj.searchParams.delete(QUERY_PARAM_PLACES);
       }
@@ -268,6 +268,8 @@
           places.map(place => this.placeIds.add(place));
           // TODO ugly workaround, but I'm too lazy to fix it :(
           setTimeout(() => {
+            places = places.join(PLACES_SEPARATOR_SYMBOL);
+
             this.fire('placesChanged', { places });
           });
 
@@ -384,6 +386,7 @@
           } else if (key === 'Enter') {
             $firstVisibleCheckbox.checked = !$firstVisibleCheckbox.checked;
 
+            this.togglePlace($firstVisibleCheckbox.value);
             event.preventDefault();
           } else {
             // do nothing
