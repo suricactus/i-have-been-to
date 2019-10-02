@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>I have been to...</title>
   <meta property="description" content="" />
-  <meta property="og:title" content="" />
-  <meta property="og:description" content="" />
-  <meta property="og:image" content="" />
+  <meta property="og:title" content="I have been to..." />
+  <meta property="og:description" content="I have travelled to all these countries, what about you?" />
+  <meta property="og:image" content="./images/sharable.jpg" />
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 </head>
 <body>
   <div id="map"></div>
@@ -90,7 +91,7 @@
     const PLACES_SEPARATOR_SYMBOL = '.';
     const map = L.map('map').setView([50, 15], 5);
     const updateLocalStorage = (places) => {
-      localStorage.setItem(LOCAL_STORAGE_KEY_PLACES, places);
+      localStorage.setItem(LOCAL_STORAGE_KEY_PLACES, places.join(PLACES_SEPARATOR_SYMBOL));
     };
     const getRelativeUrl = (path) => {
       const url = new URL(window.location.href);
@@ -120,7 +121,7 @@
       const urlObj = new URL(document.location);
 
       if(places) {
-        urlObj.searchParams.set(QUERY_PARAM_PLACES, places);
+        urlObj.searchParams.set(QUERY_PARAM_PLACES, places.join(PLACES_SEPARATOR_SYMBOL));
       } else {
         urlObj.searchParams.delete(QUERY_PARAM_PLACES);
       }
@@ -224,7 +225,7 @@
         },
 
         onAdd(map) {
-          this.$container.innerHTML = '<button id="cc-share" class="btn">Share</button>';
+          this.$container.innerHTML = '<button type="button" id="cc-share" class="btn">Share</button>';
           this.$share = this.$container.querySelector('#cc-share');
           this.$share.addEventListener('click', (event) => this.onShareButtonClick());
           this.$copyBtn.addEventListener('click', (event) => this.onCopyButtonClick(event))
@@ -412,12 +413,12 @@
             } else {
               this.$search.focus();
             }
-          } else if (key === 'Escape') {
+          } else if (key === 'Escape' || key === 'Backspace') {
             this.$search.focus();
           } else if (key === 'Enter') {
             target.click();
           } else {
-            // do nothings
+            // do nothing
           }
         },
 
