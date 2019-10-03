@@ -5,9 +5,8 @@
   <meta property="description" content="" />
   <meta property="og:title" content="I have been to..." />
   <meta property="og:description" content="I have travelled to all these countries, what about you?" />
-  <meta property="og:image" content="https://i.imgur.com/cyZr72b.jpg" />
+  <meta property="og:image" content="https://suricactus.github.io/i-have-been-to/images/sharable.jpg" />
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-  <link rel="icon" href="_/img/favicon.png">
 </head>
 <body>
   <div id="map"></div>
@@ -269,9 +268,9 @@
           places.map(place => this.placeIds.add(place));
           // TODO ugly workaround, but I'm too lazy to fix it :(
           setTimeout(() => {
-            places = places.join(PLACES_SEPARATOR_SYMBOL);
-
-            this.fire('placesChanged', { places });
+            this.fire('placesChanged', {
+              places: places.join(PLACES_SEPARATOR_SYMBOL),
+            });
           });
 
           this.placesLayer = L.geoJSON(geojson, {
